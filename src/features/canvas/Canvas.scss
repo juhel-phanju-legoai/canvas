@@ -1,0 +1,22 @@
+// Colors
+$bg-color: #1b1b1b;
+$dot-color: #010101;
+
+// Dimensions
+$dot-size: 1px;
+$dot-space: 7px;
+
+.canvas-cover{
+	background:
+		linear-gradient(90deg, $bg-color ($dot-space - $dot-size), transparent 1%) center,
+		linear-gradient($bg-color ($dot-space - $dot-size), transparent 1%) center,
+		$dot-color;
+	background-size: $dot-space $dot-space;
+    width: 100%;
+    height: 100%;
+}
+
+.gray-node {
+	fill: #808080 !important;
+	stroke: #6d6d6d !important;
+}      
