@@ -10,7 +10,6 @@ type TForignKey = {
 };
 
 type TNode = {
-  id: number;
   name: string;
   type: string;
   level: number;
@@ -111,7 +110,6 @@ export async function getNodesAndLinksFromGlossary(data: TGlossary[]) {
       color = data.color;
     }
     const tableNode: TNode = {
-      id: record.id,
       name: record.name,
       type: record.type,
       masterId: record.masterId,
@@ -127,7 +125,6 @@ export async function getNodesAndLinksFromGlossary(data: TGlossary[]) {
 
     record.subset?.forEach((col) => {
       const node: TNode = {
-        id: col.id,
         name: col.name,
         type: col.type,
         masterId: col.masterId,
@@ -136,7 +133,7 @@ export async function getNodesAndLinksFromGlossary(data: TGlossary[]) {
         parentId: record.masterId,
         size: 20,
         dataType: record.dataTypes,
-        icon: col.dataTypes[0],
+        icon: col.dataTypes[0] ?? "",
         color: color, 
       };
       nodes.push(node);

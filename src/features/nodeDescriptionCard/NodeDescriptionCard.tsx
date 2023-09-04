@@ -183,11 +183,11 @@ export default function NodeDescriptionCard(props: IProps) {
           <Header
             className="pb-1"
             name={nodeGlossary?.name ?? ""}
-            dataType={nodeGlossary?.type == "table" ? "Table" : `${nodeGlossary?.dataType[0]} | ${nodeGlossary?.dataType[1]}`}
+            dataType={nodeGlossary?.type == "table" ? "Table" : `${nodeGlossary?.dataTypes[0]} | ${nodeGlossary?.dataTypes[1]}`}
           />
           <Glossary
             className="py-1"
-            content={nodeGlossary?.businessGlossary ?? ""}
+            content={nodeGlossary?.bussinessGlossary ?? ""}
           />
           <Tags
             className="py-1"
@@ -212,7 +212,7 @@ export default function NodeDescriptionCard(props: IProps) {
               "st48379",
               "el73863",
             ]}
-            text={nodeGlossary?.sampleData ?? ""}
+            text={""}
           />
         </div>
       </div>

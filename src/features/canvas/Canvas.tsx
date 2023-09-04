@@ -79,9 +79,7 @@ export default function CanvasV3() {
 
   const openContextMenu = (x: number, y: number, masterId: string) => {
     setContextMenu({ open: true, x, y, masterId });
-    console.log("jfkldj");
     document.querySelectorAll(".gray-node").forEach((circle) => {
-      console.log("here11");
       circle.classList.add("gray-before-context");
     });
     const circles = document.querySelectorAll(".circle-0");
