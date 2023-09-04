@@ -6,7 +6,7 @@ import {configData} from "../data/configData";
 type TForignKey = {
   source: string;
   target: string;
-  score: number;
+  // score: number;
 };
 
 type TNode = {
@@ -119,7 +119,7 @@ export async function getNodesAndLinksFromGlossary(data: TGlossary[]) {
       level: 0,
       parentId: null,
       size: 40,
-      dataType: record.dataType,
+      dataType: record.dataTypes,
       icon: record.type,
       color: color, 
     };
@@ -135,8 +135,8 @@ export async function getNodesAndLinksFromGlossary(data: TGlossary[]) {
         level: 1,
         parentId: record.masterId,
         size: 20,
-        dataType: record.dataType,
-        icon: col.dataType[0],
+        dataType: record.dataTypes,
+        icon: col.dataTypes[0],
         color: color, 
       };
       nodes.push(node);
@@ -163,7 +163,7 @@ export async function getLinksOfForeignConnection(nodes: TNode[]) {
     let target = nodes.filter((node) => node.masterId == con.target)[0];
 
     if (source && target) {
-    links.push({ source, target, color: "#ffffff", distance: 100, score: con.score});
+    links.push({ source, target, color: "#ffffff", distance: 100, score: 0});
     }
   });
   return links;

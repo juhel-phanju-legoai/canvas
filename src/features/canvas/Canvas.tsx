@@ -3,6 +3,8 @@ import "./Canvas.scss";
 import { setD3Simulation } from "./utils/d3";
 import NodeDescriptionCard from "@/features/nodeDescriptionCard/NodeDescriptionCard";
 import { glossary_data } from "./data/glossary";
+import Modal from "@/components/modal/Modal";
+import AddNode from "../addnode/AddNode";
 
 type TDisplaySize = {
   width: number;
@@ -31,7 +33,7 @@ const initialContextMenuPosition: TContextMenuPosition = {
 };
 
 export default function CanvasV3() {
-  const  glossary = glossary_data;
+  const [glossary, setGlossary] = React.useState(glossary_data);
   const svgRef = React.useRef<SVGSVGElement | null>(null);
   const canvasRef = React.useRef<HTMLDivElement>(null);
   const [displaySize, setDisplaySize] = React.useState<TDisplaySize>({
@@ -51,6 +53,7 @@ export default function CanvasV3() {
     y: 0,
     text: "tooltip",
   });
+  const [addNode, setAddNode] = React.useState(false);
 
   const updateTooltip = (
     open: boolean,
@@ -68,19 +71,19 @@ export default function CanvasV3() {
       circle.classList.remove("gray-node");
     });
     document.querySelectorAll(".gray-before-context").forEach((circle) => {
-      console.log("here")
-      circle.classList.add("gray-node")
-      circle.classList.remove("gray-before-context")
-    })
+      console.log("here");
+      circle.classList.add("gray-node");
+      circle.classList.remove("gray-before-context");
+    });
   };
 
   const openContextMenu = (x: number, y: number, masterId: string) => {
     setContextMenu({ open: true, x, y, masterId });
-    console.log("jfkldj")
+    console.log("jfkldj");
     document.querySelectorAll(".gray-node").forEach((circle) => {
-      console.log("here11")
-      circle.classList.add("gray-before-context")
-    })
+      console.log("here11");
+      circle.classList.add("gray-before-context");
+    });
     const circles = document.querySelectorAll(".circle-0");
     circles.forEach((circle) => {
       circle.classList.add("gray-node");
@@ -101,7 +104,7 @@ export default function CanvasV3() {
   // d3 svg
   useEffect(() => {
     setD3Simulation(svgRef, glossary ?? [], updateTooltip, openContextMenu);
-  }, []);
+  }, [glossary]);
 
   useEffect(() => {
     if (!svgRef || !svgRef.current) return;
@@ -142,7 +145,6 @@ export default function CanvasV3() {
     };
   }, []);
 
-
   return (
     <div className="select-none canvas-cover " ref={canvasRef}>
       <svg
@@ -150,6 +152,11 @@ export default function CanvasV3() {
         width={displaySize.width}
         height={displaySize.height}
         viewBox={`${viewBoxPosition.x} ${viewBoxPosition.y} ${viewBoxZoom} ${viewBoxZoom}`}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          if (contextMenu.open) return;
+          setAddNode(true);
+        }}
       >
         <defs>
           <marker
@@ -162,7 +169,10 @@ export default function CanvasV3() {
             refY="6"
             orient="auto"
           >
-            <path d="M2,2 L10,6 L2,10 L6,6 L2,2" className="fill-skin-secondary"></path>
+            <path
+              d="M2,2 L10,6 L2,10 L6,6 L2,2"
+              className="fill-skin-secondary"
+            ></path>
           </marker>
         </defs>
       </svg>
@@ -175,7 +185,7 @@ export default function CanvasV3() {
       />
 
       <div
-        className="absolute p-2 rounded bg-skin-dark text-skin-base bg-opacity-60"
+        className="absolute p-2 text-white bg-black rounded bg-opacity-60"
         style={{
           top: tooltip.y + 12 + "px",
           left: tooltip.x - 5 + "px",
@@ -184,6 +194,13 @@ export default function CanvasV3() {
       >
         {tooltip.text}
       </div>
+      <Modal open={addNode} onClose={() => setAddNode(false)}>
+        <AddNode
+          onClose={() => setAddNode(false)}
+          glossary={glossary}
+          setGlossary={setGlossary}
+        />
+      </Modal>
     </div>
   );
 }

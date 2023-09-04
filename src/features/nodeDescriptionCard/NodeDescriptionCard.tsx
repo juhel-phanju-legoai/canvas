@@ -171,7 +171,7 @@ export default function NodeDescriptionCard(props: IProps) {
     props.open && (
       <div
         ref={contextMenuRef}
-        className="fixed z-50 text-sm rounded shadow-sm w-80 bg-skin-muted text-skin-base"
+        className="fixed z-50 text-sm text-white rounded shadow-sm w-80 bg-slate-700"
         style={{ left: `${props.x}px`, top: `${props.y}px` }}
       >
         <div className="flex justify-end p-1">

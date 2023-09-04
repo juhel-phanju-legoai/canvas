@@ -1,4 +1,4 @@
-export const foregnLinks = [
+[
     {
       "source": "domain-customer-id",
       "target": "domain-orders-id"
