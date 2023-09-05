@@ -54,6 +54,8 @@ export default function CanvasV3() {
     text: "tooltip",
   });
   const [addNode, setAddNode] = React.useState(false);
+  const prevAddedRef = React.useRef(true);
+
 
   const updateTooltip = (
     open: boolean,
@@ -106,42 +108,99 @@ export default function CanvasV3() {
 
   useEffect(() => {
     if (!svgRef || !svgRef.current) return;
-    let cursorAtDown_X: number;
-    let cursorAtDown_Y: number;
 
     function mouseWheelHandler(event: WheelEvent) {
       setViewBoxZoom((prev) => prev + event.deltaY / 1);
     }
-
     svgRef.current.addEventListener("wheel", mouseWheelHandler);
 
-    function mouseDownHandler(e: MouseEvent) {
-      if (e.button != 0) return;
-      cursorAtDown_X = e.x;
-      cursorAtDown_Y = e.y;
-      svgRef?.current?.addEventListener("mousemove", mouseMoveHandler);
-      svgRef?.current?.addEventListener("mouseup", mouseUpHandler);
-    }
-
-    function mouseMoveHandler(e: MouseEvent) {
-      setViewBoxPosition({
-        x: (cursorAtDown_X - e.x) * 3,
-        y: (cursorAtDown_Y - e.y) * 3,
-      });
-    }
-
-    function mouseUpHandler() {
-      // remove event mousemove && mouseup
-      svgRef?.current?.removeEventListener("mousemove", mouseMoveHandler);
-      svgRef?.current?.removeEventListener("mouseup", mouseUpHandler);
-    }
-
-    svgRef.current.addEventListener("mousedown", mouseDownHandler);
     return () => {
       svgRef.current?.removeEventListener("wheel", mouseWheelHandler);
-      svgRef.current?.removeEventListener("mousedown", mouseDownHandler);
     };
   }, []);
+
+  useEffect(() => {
+    window.addEventListener('mousedown', mouseDownHandler);
+    window.addEventListener('mouseup', mouseUpHandler);
+
+    return () => {
+      // Remove event listeners when component unmounts
+      window.removeEventListener('mousedown', mouseDownHandler);
+      window.removeEventListener('mouseup', mouseUpHandler);
+    };
+  }, []);
+
+  let cursorAtDown_X: number = 0;
+  let cursorAtDown_Y: number = 0;
+
+  function mouseDownHandler(e: MouseEvent) {
+    if (e.button != 0) return;
+    cursorAtDown_X = e.x;
+    cursorAtDown_Y = e.y;
+    svgRef?.current?.addEventListener("mousemove", mouseMoveHandler);
+    svgRef?.current?.addEventListener("mouseup", mouseUpHandler);
+  }
+
+  function mouseMoveHandler(e: MouseEvent) {
+
+    setViewBoxPosition((prev) => {
+      if (!prevAddedRef.current) {
+        prevAddedRef.current = true;
+        return prev;
+      }
+
+      const sensitivityFactor = 5; // Adjust this as needed
+      const newX = prev.x + (cursorAtDown_X - e.x) / sensitivityFactor;
+      const newY = prev.y + (cursorAtDown_Y - e.y) / sensitivityFactor;
+
+      return { x: newX, y: newY };
+    })
+  }
+
+  function mouseUpHandler() {
+    // remove event mousemove && mouseup
+    svgRef?.current?.removeEventListener("mousemove", mouseMoveHandler);
+    // svgRef?.current?.removeEventListener("mouseup", mouseUpHandler);
+  }
+
+  // useEffect(() => {
+  //   if (!svgRef || !svgRef.current) return;
+  //   let cursorAtDown_X: number;
+  //   let cursorAtDown_Y: number;
+
+  //   function mouseWheelHandler(event: WheelEvent) {
+  //     setViewBoxZoom((prev) => prev + event.deltaY / 1);
+  //   }
+
+  //   svgRef.current.addEventListener("wheel", mouseWheelHandler);
+
+  //   function mouseDownHandler(e: MouseEvent) {
+  //     if (e.button != 0) return;
+  //     cursorAtDown_X = e.x;
+  //     cursorAtDown_Y = e.y;
+  //     svgRef?.current?.addEventListener("mousemove", mouseMoveHandler);
+  //     svgRef?.current?.addEventListener("mouseup", mouseUpHandler);
+  //   }
+
+  //   function mouseMoveHandler(e: MouseEvent) {
+  //     setViewBoxPosition({
+  //       x: (cursorAtDown_X - e.x) * 3,
+  //       y: (cursorAtDown_Y - e.y) * 3,
+  //     });
+  //   }
+
+  //   function mouseUpHandler() {
+  //     // remove event mousemove && mouseup
+  //     svgRef?.current?.removeEventListener("mousemove", mouseMoveHandler);
+  //     svgRef?.current?.removeEventListener("mouseup", mouseUpHandler);
+  //   }
+
+  //   svgRef.current.addEventListener("mousedown", mouseDownHandler);
+  //   return () => {
+  //     svgRef.current?.removeEventListener("wheel", mouseWheelHandler);
+  //     svgRef.current?.removeEventListener("mousedown", mouseDownHandler);
+  //   };
+  // }, []);
 
   return (
     <div className="select-none canvas-cover " ref={canvasRef}>

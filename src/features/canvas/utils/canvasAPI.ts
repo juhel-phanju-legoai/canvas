@@ -1,6 +1,6 @@
 import { TGlossary } from "@/types/glossary";
 import { foregnLinks } from "../data/foreignLinks";
-import {configData} from "../data/configData";      
+import { configData } from "../data/configData";
 // import { glossary } from "./data";
 
 type TForignKey = {
@@ -28,6 +28,7 @@ type TLink = {
   color: string;
   distance?: number;
   score?: number;
+  child?: TGlossary[];
 };
 
 // export async function getNodesAndLinks() {
@@ -97,7 +98,7 @@ export async function getNodesAndLinksFromGlossary(data: TGlossary[]) {
 
   let nodeData: {}[] = [];
 
-  const graphConfigData = configData
+  const graphConfigData = configData;
 
   if (graphConfigData) {
     nodeData = graphConfigData.nodes;
@@ -119,7 +120,7 @@ export async function getNodesAndLinksFromGlossary(data: TGlossary[]) {
       size: 40,
       dataType: record.dataTypes,
       icon: record.type,
-      color: color, 
+      color: color,
     };
     nodes.push(tableNode);
 
@@ -134,7 +135,7 @@ export async function getNodesAndLinksFromGlossary(data: TGlossary[]) {
         size: 20,
         dataType: record.dataTypes,
         icon: col.dataTypes[0] ?? "",
-        color: color, 
+        color: color,
       };
       nodes.push(node);
 
@@ -143,6 +144,7 @@ export async function getNodesAndLinksFromGlossary(data: TGlossary[]) {
         target: node,
         distance: 180,
         color: "#808080",
+        child: record.subset,
       });
     });
   });
@@ -160,7 +162,7 @@ export async function getLinksOfForeignConnection(nodes: TNode[]) {
     let target = nodes.filter((node) => node.masterId == con.target)[0];
 
     if (source && target) {
-    links.push({ source, target, color: "#ffffff", distance: 100, score: 0});
+      links.push({ source, target, color: "#ffffff", distance: 100, score: 0 });
     }
   });
   return links;

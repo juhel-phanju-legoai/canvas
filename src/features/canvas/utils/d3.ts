@@ -8,6 +8,8 @@ import {
   forceSimulation,
   pie,
   select,
+  forceX,
+  forceY,
 } from "d3";
 import {
   getLinksOfForeignConnection,
@@ -109,21 +111,63 @@ export async function setD3Simulation(
   const showContextMenu = (x: number, y: number, masterId: string) => {
     openContextMenu(x, y, masterId);
   };
+  function distance(link: any) {
+    return link.child.length > 5
+      ? link.child.length * 20
+      : link.child.length * 20;
+  }
+
+  // const simulation = forceSimulation(nodes as {}[])
+  //   .force("charge", forceManyBody().strength(-180))
+  //   .force(
+  //     "link",
+  //     forceLink(links as any[]).distance((link: any) => link.distance)
+  //   )
+  //   .force("center", forceCenter(width / 2, height / 2))
+  //   .force(
+  //     "collide",
+  //     forceCollide()
+  //       .strength(1)
+  //       .radius((d: any) => d.size)
+  //       .iterations(1)
+  //   );
 
   const simulation = forceSimulation(nodes as {}[])
-    .force("charge", forceManyBody().strength(-180))
-    .force(
-      "link",
-      forceLink(links as any[]).distance((link: any) => link.distance)
-    )
     .force("center", forceCenter(width / 2, height / 2))
-    .force(
-      "collide",
-      forceCollide()
-        .strength(1)
-        .radius((d: any) => d.size)
-        .iterations(1)
-    );
+    .force("x", forceX(width / 2))
+    .force("y", forceY(height / 2))
+    .force("charge", forceManyBody().strength(-(nodes.length * 60)))
+    .force("link", forceLink(links as any[]).distance(distance))
+
+    // .force('collide', forceCollide().radius((d: any) => d.size).iterations(1))
+    .alphaTarget(0)
+    .alphaDecay(0.05);
+
+ 
+  const updateGraph = (node: any) => {
+    simulation.alpha(1).restart();
+  };
+  const dragNode = (simulation: any) => {
+    const dragstarted = (event: any, d: any) => {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    };
+    const dragged = (event: any, d: any) => {
+      d.fx = event.x;
+      d.fy = event.y;
+    };
+    const dragended = (event: any, d: any) => {
+      if (!event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+      updateGraph(d);
+    };
+    return drag()
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended);
+  };
 
   // function dragstarted(d: any) {
   //   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
@@ -153,8 +197,9 @@ export async function setD3Simulation(
   const lines = svg
     .selectAll(".inner-connections")
     .data(links)
-    .enter()
-    .append("line")
+    // .enter()
+    // .append("line")
+    .join("line")
     .attr("id", (link: any) => link.target.masterId)
     .attr("class", (link: any) =>
       listToString([
@@ -173,8 +218,9 @@ export async function setD3Simulation(
   const foreignLines = svg
     .selectAll(".foreign-connections")
     .data(foreignLinks)
-    .enter()
-    .append("line")
+    // .enter()
+    // .append("line")
+    .join("line")
     .attr("class", (link: any) =>
       listToString([
         "svg-object",
@@ -192,8 +238,9 @@ export async function setD3Simulation(
   const foreignLineScoreOutline = svg
     .selectAll(".foreign-connection-score-outline")
     .data(foreignLinks)
-    .enter()
-    .append("circle")
+    // .enter()
+    // .append("circle")
+    .join("circle")
     .attr("class", (link: any) =>
       listToString([
         "svg-object",
@@ -211,8 +258,9 @@ export async function setD3Simulation(
   const foreignLineScore = svg
     .selectAll(".foreign-connection-score")
     .data(foreignLinks)
-    .enter()
-    .append("circle")
+    // .enter()
+    // .append("circle")
+    .join("circle")
     .attr("class", (link: any) =>
       listToString([
         "svg-object",
@@ -229,7 +277,8 @@ export async function setD3Simulation(
   const foreignLineScoreText = svg
     .selectAll(".foreign-connection-score-text")
     .data(foreignLinks)
-    .enter()
+    // .enter()
+    // .append("text")
     .append("text")
     .attr("text-anchor", "middle")
     .attr("alignment-baseline", "middle")
@@ -248,8 +297,9 @@ export async function setD3Simulation(
   const circles_0 = svg
     .selectAll(".circle-0")
     .data(nodes)
-    .enter()
-    .append("circle")
+    // .enter()
+    // .append("circle")
+    .join("circle")
     .attr("r", (node: any) => node.size * 1.1 || 30)
     .attr("fill", (node: any) => node.color)
     .attr("class", (node: any) =>
@@ -318,8 +368,9 @@ export async function setD3Simulation(
   const circles_1 = svg
     .selectAll(".circle-1")
     .data(nodes)
-    .enter()
-    .append("circle")
+    // .enter()
+    // .append("circle")
+    .join("circle")
     .attr("r", (node: any) => node.size)
     .attr("fill", "#1b1b1b")
     .attr("class", (node: any) =>
@@ -337,8 +388,9 @@ export async function setD3Simulation(
   const images = svg
     .selectAll("image")
     .data(nodes)
-    .enter()
-    .append("image")
+    // .enter()
+    // .append("image")
+    .join("image")
     .attr("xlink:href", (node: any) => getSvg(node.icon))
     .attr("width", (node: any) => node.size * 1.1)
     .attr("height", (node: any) => node.size * 1.1)
@@ -361,8 +413,10 @@ export async function setD3Simulation(
   const textBackground = svg
     .selectAll(".textBackground")
     .data(nodes)
-    .enter()
-    .append("rect")
+    // .enter()
+    // .append("rect")
+    .join("rect")
+
     .attr("class", (node: any) =>
       listToString([
         "svg-object",
@@ -375,11 +429,11 @@ export async function setD3Simulation(
     )
     .attr("fill", textBackgroudColor)
     .attr("height", 20)
-    .attr("width", (node: any) => clipText(node.name, node.type).length * 8)
+    .attr("width", (node: any) => clipText(node.name, node.type)?.length * 8)
     .attr(
       "transform",
       (node: any) =>
-        `translate(${-(clipText(node.name, node.type).length * 8) / 2}, ${
+        `translate(${-(clipText(node.name, node.type)?.length * 8) / 2}, ${
           node.size * 1.1 + 7
         })`
     );
@@ -387,8 +441,10 @@ export async function setD3Simulation(
   const texts = svg
     .selectAll(".node-name")
     .data(nodes)
-    .enter()
-    .append("text")
+    // .enter()
+    // .append("text")
+    .join("text")
+
     .attr("text-anchor", "middle")
     .attr("alignment-baseline", "middle")
     .attr("fill", "white")
@@ -409,8 +465,10 @@ export async function setD3Simulation(
   const circleWrapper = svg
     .selectAll(".circle-wrapper")
     .data(nodes)
-    .enter()
-    .append("circle")
+    // .enter()
+    // .append("circle")
+    .join("circle")
+
     .attr("r", (node: any) => node.size * 1.1 + 5 || 30)
     .attr("fill", "transparent")
     .attr("class", (node: any) =>
