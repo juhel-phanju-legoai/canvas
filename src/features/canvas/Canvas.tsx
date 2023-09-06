@@ -44,7 +44,7 @@ export default function CanvasV3() {
   });
   const [viewBoxZoom, setViewBoxZoom] = React.useState(window.innerWidth);
   const [viewBoxPosition, setViewBoxPosition] = React.useState({ x: 0, y: 0 });
-  const [contextMenu, setContextMenu] = React.useState<TContextMenuPosition>(
+  const [contextMenu, setContextMenu] = React.useState<TContextMenuPosition>( 
     initialContextMenuPosition
   );
   const [tooltip, setTooltip] = React.useState<TTooltip>({
@@ -73,7 +73,6 @@ export default function CanvasV3() {
       circle.classList.remove("gray-node");
     });
     document.querySelectorAll(".gray-before-context").forEach((circle) => {
-      console.log("here");
       circle.classList.add("gray-node");
       circle.classList.remove("gray-before-context");
     });
@@ -149,7 +148,7 @@ export default function CanvasV3() {
         return prev;
       }
 
-      const sensitivityFactor = 5; // Adjust this as needed
+      const sensitivityFactor = 3; // Adjust this as needed
       const newX = prev.x + (cursorAtDown_X - e.x) / sensitivityFactor;
       const newY = prev.y + (cursorAtDown_Y - e.y) / sensitivityFactor;
 
